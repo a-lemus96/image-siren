@@ -3,9 +3,8 @@ import os
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torch.utils.data import Dataloader, Dataset
 
-import typing
+from typing import Tuple 
 
 
 # SINE LAYER MODULE
@@ -141,7 +140,8 @@ class Siren(nn.Module):
         self.net = nn.Sequential(*self.net)
 
 
-    def forward(self, 
+    def forward(
+            self, 
             coords: torch.Tensor) -> Tuple[torch.Tensor, ...]:
         r'''Forward pass method through SIREN module.
         -----------------------------------------------------------------------
