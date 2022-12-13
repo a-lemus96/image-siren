@@ -1,12 +1,11 @@
 import os
 
+from PIL import Image
 import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import  Resize, Compose, ToTensor, Normalize
-from PIL import Image
-
 from typing import Tuple
 
 

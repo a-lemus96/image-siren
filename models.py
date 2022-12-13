@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -33,7 +34,7 @@ class SineLayer(nn.Module):
         self.is_first = is_first
 
         # Create linear layer
-        self.linear = nn.Linear(self.in_features, out_features, bias)
+        self.linear = nn.Linear(in_features, out_features, bias)
 
         # Initialize weights
         self.__init_weights()
@@ -51,9 +52,9 @@ class SineLayer(nn.Module):
                                             1. / self.in_features)
             else:
                 self.linear.weight.uniform_((-np.sqrt(6 / self.in_features) /
-                                             self.omega),
+                                             self.omega_0),
                                             (np.sqrt(6 / self.in_features) /
-                                             self.omega))
+                                             self.omega_0))
 
 
     def forward(
@@ -112,7 +113,7 @@ class Siren(nn.Module):
 
         self.net = [] # Ordered list containing model layers
         # Append first layer
-        self.net.append(SineLayer(in_features, out_features,
+        self.net.append(SineLayer(in_features, hidden_features,
                                   is_first=True, omega_0=first_omega_0))
 
         # Append hidden layers
@@ -122,7 +123,7 @@ class Siren(nn.Module):
 
         # Append last layer
         if outermost_linear:
-            final_linear = nn.linear(hidden_features, out_features)
+            final_linear = nn.Linear(hidden_features, out_features)
 
             # Initialize weights accordingly
             with torch.no_grad():
@@ -150,7 +151,7 @@ class Siren(nn.Module):
         Returns:
             output: (batch_size, out_features)-shape tensor
             coords: Clone of original input tensor that requires gradient''' 
-       coords = coords.clone().detach().requires_grad_(True)
-       output = self.net(coords)
+        coords = coords.clone().detach().requires_grad_(True)
+        output = self.net(coords)
 
-       return output, coords
+        return output, coords
