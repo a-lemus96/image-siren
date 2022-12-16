@@ -80,6 +80,10 @@ class ImageDataset(Dataset):
         img = get_image_tensor(img_path, sidelength=sidelength)
         self.n_channels = img.shape[0]
         self.pixels = img.permute(1, 2, 0).view(-1, self.n_channels) 
+
+        # Noisy image is saved as a copy of pixels
+        self.noisy = torch.clone(self.pixels)
+
         # Get flattened grid of coordinates
         self.coords = get_mgrid(sidelength, 2)
 
@@ -102,4 +106,14 @@ class ImageDataset(Dataset):
         Returns:
             Tuple of tensors containing element coords and pixel values.'''
         
-        return self.coords[idx], self.pixels[idx]
+        return self.coords[idx], self.noisy[idx]
+
+
+    def apply_noise(self, sigma: float) -> None:
+        r'''Applies Gaussian noise to the original image.
+        -----------------------------------------------------------------------
+        Args:
+            sigma: Standard deviation of Gaussian distribution.
+        Returns:
+            None''' 
+        self.noisy = self.pixels + torch.normal(0., sigma, self.pixels.shape)
